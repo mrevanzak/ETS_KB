@@ -1,5 +1,5 @@
-# Assets: https://techwithtim.net/wp-content/uploads/2020/09/assets.zip
 import pygame
+from checkers.button import Button
 from checkers.constants import WIDTH, HEIGHT, SQUARE_SIZE, RED, WHITE, BLUE, BLACK
 from checkers.game import Game
 from minimax.algorithm import minimax
@@ -8,9 +8,14 @@ FPS = 60
 
 pygame.init()
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Checkers')
 font = "assets/big_noodle_titling.ttf"
+BG = pygame.image.load("assets/bg.jpeg")
+
+
+def get_font(size):  # Returns Press-Start-2P in the desired size
+    return pygame.font.Font(font, size)
 
 
 def text_format(message, textFont, textSize, textColor):
@@ -37,12 +42,12 @@ def get_row_col_from_mouse(pos):
 def main(mode):
     run = True
     clock = pygame.time.Clock()
-    game = Game(screen)
+    game = Game(SCREEN)
 
     while run:
         clock.tick(FPS)
 
-        if game.turn == BLUE and mode == "multiplayer":
+        if game.turn == BLUE and mode == "pvc":
             value, new_board = minimax(game.get_board(), 4, WHITE, game)
             game.ai_move(new_board)
 
@@ -66,38 +71,40 @@ def main(mode):
 
 def main_menu():
     menu = True
-    click = False
     clock = pygame.time.Clock()
 
     while menu:
-        button_1 = pygame.Rect(WIDTH/2 - 100, HEIGHT/2 - 50, 200, 100)
-        button_2 = pygame.Rect(WIDTH/2 - 100, HEIGHT/2 + 50, 200, 100)
-        button_3 = pygame.Rect(WIDTH/2 - 100, HEIGHT/2 + 150, 200, 100)
+        SCREEN.blit(BG, (0, 0))
 
-        if button_1.collidepoint(pygame.mouse.get_pos()):
-            if click:
-                main("singleplayer")
-        if button_2.collidepoint(pygame.mouse.get_pos()):
-            if click:
-                main("multiplayer")
-        if button_3.collidepoint(pygame.mouse.get_pos()):
-            if click:
-                menu = False
+        MENU_MOUSE_POS = pygame.mouse.get_pos()
 
-        screen.fill(WHITE)
-        draw_text("Checkers", font, BLACK, screen,
-                  WIDTH/2 - 100, HEIGHT/2 - 100, 90)
-        pygame.draw.rect(screen, RED, button_1)
-        pygame.draw.rect(screen, BLUE, button_2)
-        pygame.draw.rect(screen, BLACK, button_3)
+        MENU_TEXT = get_font(100).render("CHECKERS", True, "#9267ff")
+        MENU_RECT = MENU_TEXT.get_rect(center=(400, 200))
+
+        PLAY_BUTTON = Button(image=pygame.image.load("assets/Button Rect.png"), pos=(400, 350),
+                             text_input="PvP", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        OPTIONS_BUTTON = Button(image=pygame.image.load("assets/Button Rect.png"), pos=(400, 475),
+                                text_input="PvC", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+        QUIT_BUTTON = Button(image=pygame.image.load("assets/Button Rect.png"), pos=(400, 600),
+                             text_input="QUIT", font=get_font(75), base_color="#d7fcd4", hovering_color="White")
+
+        SCREEN.blit(MENU_TEXT, MENU_RECT)
+
+        for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
+            button.changeColor(MENU_MOUSE_POS)
+            button.update(SCREEN)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 menu = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    click = True
+                if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    main("pvp")
+                if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    main("pvc")
+                if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    menu = False
 
         pygame.display.update()
         clock.tick(FPS)
