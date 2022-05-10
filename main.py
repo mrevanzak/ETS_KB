@@ -13,31 +13,14 @@ pygame.display.set_caption('Checkers')
 font = "assets/big_noodle_titling.ttf"
 BG = pygame.image.load("assets/bg.jpeg")
 
-
-def get_font(size):  # Returns Press-Start-2P in the desired size
+def get_font(size):
     return pygame.font.Font(font, size)
-
-
-def text_format(message, textFont, textSize, textColor):
-    newFont = pygame.font.Font(textFont, textSize)
-    newText = newFont.render(message, 0, textColor)
-
-    return newText
-
-
-def draw_text(text, font, color, surface, x, y, size):
-    textobj = text_format(text, font, size, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
-
 
 def get_row_col_from_mouse(pos):
     x, y = pos
     row = y // SQUARE_SIZE
     col = x // SQUARE_SIZE
     return row, col
-
 
 def main(mode):
     run = True
@@ -110,6 +93,5 @@ def main_menu():
         clock.tick(FPS)
 
     pygame.quit()
-
 
 main_menu()
