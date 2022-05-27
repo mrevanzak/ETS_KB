@@ -31,7 +31,7 @@ def main(mode):
         clock.tick(FPS)
 
         if game.turn == BLUE and mode == "pvc":
-            value, new_board = minimax(game.get_board(), 4, WHITE, game)
+            value, new_board = minimax(game.get_board(), 4, BLUE, game)
             game.ai_move(new_board)
 
         if game.winner() != None:
